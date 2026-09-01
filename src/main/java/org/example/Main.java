@@ -10,65 +10,20 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        HttpClient client=HttpClient.newHttpClient();
+        Client client = new Client();
 
-        //get request
-        HttpRequest request= HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users?page=2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        UserResponse result = client.getUsers();
 
-        ObjectMapper mapper=new ObjectMapper();
-        UserResponse result=mapper.readValue(response.body(), UserResponse.class);
+        System.out.println("Page: " + result.getPage());
+        System.out.println("Total users: " + result.getTotal());
 
-        //post request
-        String json = """
-                {
-                  "name": "Elina",
-                  "job": "Developer"
-                }
-                """;
+        for (User user: result.getData()){
+            System.out.println(user.getFirst_name());
+        }
 
-        HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
-
-        //System.out.println("POST response:");
-        //System.out.println(postResponse.body());
-
-        //put request
-        String jsonUpdate = """
-                {
-                  "name": "Elina",
-                  "job": "Junior Developer"
-                }
-                """;
-        HttpRequest putRequest =HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users/2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonUpdate))
-                .build();
-        HttpResponse<String> putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
-
-        //System.out.println("PUT response:");
-        //System.out.println(putResponse.body());
-
-        HttpRequest deleteRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users/2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .DELETE()
-                .build();
-        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println("DELETE status:");
-        System.out.println(deleteResponse.statusCode());
+        client.createUser();
+        client.updateUser();
+        client.deleteUser();
 
     }
 }
