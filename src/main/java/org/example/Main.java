@@ -1,10 +1,6 @@
 package org.example;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.CompletableFuture;
 
 public class Main {
 
@@ -12,18 +8,41 @@ public class Main {
 
         Client client = new Client();
 
-        UserResponse result = client.getUsers();
+        //get
+        CompletableFuture<UserResponse> future = client.getUsers();
 
-        System.out.println("Page: " + result.getPage());
-        System.out.println("Total users: " + result.getTotal());
+        future.thenAccept(result -> {
 
-        for (User user: result.getData()){
-            System.out.println(user.getFirst_name());
-        }
+            System.out.println("Page: " + result.getPage());
+            System.out.println("Total users: " + result.getTotal());
 
-        client.createUser();
-        client.updateUser();
-        client.deleteUser();
+            for (User user : result.getData()) {
+                System.out.println(user.getFirst_name());
+            }
+        });
+
+        //post
+        CompletableFuture<?> postFuture = client.createUser();
+
+        postFuture.thenAccept(response -> {System.out.println("\nPOST response:");
+            System.out.println(response);
+        });
+
+        //Put
+        CompletableFuture<?> putFuture = client.updateUser();
+
+        putFuture.thenAccept(response -> {
+            System.out.println("\nPUT response:");
+            System.out.println(response);
+        });
+
+        //delete
+        CompletableFuture<?> deleteFuture = client.deleteUser();
+
+        deleteFuture.thenAccept(response -> {
+            System.out.println("\nDELETE response:");
+            System.out.println(response);
+        });
 
     }
 }
