@@ -9,18 +9,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Client {
 
     private HttpClient client;
+    private RequestBuilder requestBuilder;
 
     public Client(){
         client = HttpClient.newHttpClient();
+        requestBuilder=new RequestBuilder();
     }
 
     public UserResponse getUsers() throws Exception{
 
-        HttpRequest request= HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users?page=2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .GET()
-                .build();
+        HttpRequest request= requestBuilder.get("https://reqres.in/api/users?page=2");
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -38,12 +36,7 @@ public class Client {
                 }
                 """;
 
-        HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+        HttpRequest postRequest = requestBuilder.post("https://reqres.in/api/users",json);
         HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
 
         //System.out.println("POST response:");
@@ -57,12 +50,7 @@ public class Client {
                   "job": "Junior Developer"
                 }
                 """;
-        HttpRequest putRequest =HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users/2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonUpdate))
-                .build();
+        HttpRequest putRequest = requestBuilder.put("https://reqres.in/api/users/2", jsonUpdate);
         HttpResponse<String> putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
 
         //System.out.println("PUT response:");
@@ -70,11 +58,7 @@ public class Client {
     }
 
     public void deleteUser() throws Exception{
-        HttpRequest deleteRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://reqres.in/api/users/2"))
-                .header("x-api-key", "free_user_3IgO3hcjn2uHCjh371FEEmT1WlU")
-                .DELETE()
-                .build();
+        HttpRequest deleteRequest = requestBuilder.delete("https://reqres.in/api/users/2");
         HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
 
         //System.out.println("DELETE status:");
